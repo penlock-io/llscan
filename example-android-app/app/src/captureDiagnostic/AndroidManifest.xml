@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
+    <application android:label="Bitcoin Vision framing diagnostic" tools:replace="android:label">
+        <!-- No wallet or PSBT entry, including explicit intents to MainActivity. -->
+        <activity android:name=".MainActivity" tools:node="remove" />
+        <activity android:name=".CaptureDiagnosticActivity" android:exported="true"
+            android:screenOrientation="portrait">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+    </application>
+</manifest>

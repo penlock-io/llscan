@@ -1,0 +1,26 @@
+Third-party inference artifacts
+
+word-detector.onnx
+  PaddlePaddle/PaddleOCR PP-OCRv4 mobile detector.
+  ONNX distribution: RapidAI/RapidOCR v3.9.2.
+  https://www.modelscope.cn/models/RapidAI/RapidOCR/resolve/v3.9.2/onnx/PP-OCRv4/det/ch_PP-OCRv4_det_mobile.onnx
+
+text-recogniser.onnx
+  PaddlePaddle/PaddleOCR PP-OCRv4 English mobile recogniser.
+  ONNX distribution: RapidAI/RapidOCR v3.9.2.
+  https://www.modelscope.cn/models/RapidAI/RapidOCR/resolve/v3.9.2/onnx/PP-OCRv4/rec/en_PP-OCRv4_rec_mobile.onnx
+
+text-recogniser.dict.txt
+  Character dictionary extracted from text-recogniser.onnx metadata.
+  Copyright the PaddlePaddle/PaddleOCR authors.
+
+These PaddleOCR/RapidOCR artifacts are distributed under Apache License 2.0.
+Copyright (c) 2016 PaddlePaddle Authors. All Rights Reserved.
+Copyright (c) 2021 RapidOCR Authors. All rights reserved.
+See LICENSE-APACHE and README.md for the pinned source and verified byte hashes.
+The two ONNX files are unmodified exports. Runtime shape adaptation does not
+rewrite their stored bytes.
+
+word-reference.onnx and word-reference.calibration are the project-authored
+reference classifier and calibration, not PaddleOCR models. They are distributed
+under the project's MIT OR Apache-2.0 license.

@@ -1,0 +1,37 @@
+[package]
+name = "bitcoin-vision-mobile"
+version = "0.1.0"
+description = "The bitcoin-vision pipeline on a phone over UniFFI: read a phrase or Penlock strips from a photo, sign PSBTs"
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
+publish = false
+
+[lib]
+crate-type = ["lib", "cdylib"]
+
+[dependencies]
+bdk_wallet = { version = "3.1.0", features = ["keys-bip39"] }
+bitcoin-vision = { path = "../../..", default-features = false, features = ["onnx"] }
+penlock = { path = "../penlock", features = ["wallet"] }
+penlock-scan = { path = "../penlock-scan", default-features = false, features = ["onnx"] }
+rand = { version = "0.9", default-features = false, features = ["os_rng"] }
+uniffi = "0.32"
+serde_json = "1"
+crc = "3"
+minicbor = { version = "0.19", features = ["alloc"] }
+qrcode = { version = "0.14", default-features = false }
+rqrr = "0.10"
+ur = "0.4"
+
+[features]
+# The bindings generator CLI; only the app build needs it.
+bindgen = ["uniffi/cli"]
+scan-profile = ["penlock-scan/scan-profile", "bitcoin-vision/scan-profile"]
+# Historical baseline and diagnostic comparison only; normal app uses lean E3.
+extent-experiment = ["scan-profile", "penlock-scan/extent-experiment", "bitcoin-vision/extent-experiment"]
+
+[[bin]]
+name = "uniffi-bindgen"
+path = "src/bin/uniffi-bindgen.rs"
+required-features = ["bindgen"]

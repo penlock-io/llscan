@@ -1,0 +1,45 @@
+[package]
+name = "bitcoin-vision"
+version = "0.1.0"
+edition = "2024"
+description = "Offline handwritten BIP39 photo recognition with word geometry and decision evidence"
+repository = "https://github.com/penlock-io/llscan"
+license = "MIT OR Apache-2.0"
+publish = false
+include = ["/Cargo.toml", "/Cargo.lock", "/LICENSE", "/LICENSE-APACHE", "/README.md", "/src/**/*.rs", "/tests/artifacts.rs", "/examples/scan.rs", "/examples/photos/handwritten.png", "/docs/images/*", "/docs/pipelines/*.md", "/models/*.onnx", "/models/*.calibration", "/models/*.txt", "/models/README.md", "/models/NOTICE", "/models/LICENSE-APACHE"]
+
+# This package is independently buildable outside the research workspace.
+[workspace]
+exclude = ["example-android-app/rust"]
+
+[dependencies]
+bip39 = "2.2"
+bitcoin_hashes = "0.14"
+image = { version = "0.25", default-features = false, features = ["png", "jpeg", "webp"] }
+imageproc = { version = "0.27", default-features = false }
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+tract-onnx = { version = "0.23", optional = true }
+
+[dev-dependencies]
+base64 = "0.22"
+tempfile = "3"
+rand = { version = "0.9", features = ["std_rng"] }
+
+[features]
+default = ["onnx"]
+onnx = ["dep:tract-onnx", "word-extent"]
+word-extent = []
+scan-profile = []
+extent-experiment = ["word-extent", "scan-profile"]
+bundled-models = ["onnx"]
+
+[[example]]
+name = "scan"
+required-features = ["bundled-models"]
+
+[profile.dev]
+opt-level = 1
+
+[profile.dev.package."*"]
+opt-level = 3

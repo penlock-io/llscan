@@ -1,0 +1,6 @@
+temperature=1.95
+min_prob=0.3
+min_margin=0.8
+model_sha256=095232826d8c0f4e19e744b8072260c2395c021125b617cf60957d27b365f08f
+canon_rule=stretch-fill-v2
+prior=flat

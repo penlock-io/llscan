@@ -1,0 +1,90 @@
+name: standalone
+on: [push, pull_request]
+permissions:
+  contents: read
+jobs:
+  crate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Rust toolchain
+        run: rustup update stable --no-self-update
+      - name: Unit tests and bundled model contracts
+        run: cargo +stable test --locked --all-features
+      - name: Example renderer
+        run: cargo +stable test --locked --features bundled-models --example scan
+      - name: No-runtime API
+        run: cargo +stable check --locked --no-default-features
+      - name: Public documentation
+        run: cargo +stable doc --locked --no-deps --features bundled-models
+      - name: Package builds without sibling repositories
+        run: cargo +stable package --locked
+      # The package excludes the app tree, so a test that reaches into it
+      # passes here and fails for whoever installs the crate.
+      - name: The packaged crate's own tests
+        working-directory: target/package/bitcoin-vision-0.1.0
+        run: cargo +stable test --offline --locked --all-features
+
+  # A green run here means the app compiles, its unit tests pass and it
+  # packages. It does not mean the app was run: nothing on a hosted runner
+  # starts it. See example-android-app/README.md for what that leaves out.
+  android:
+    runs-on: ubuntu-24.04
+    defaults:
+      run:
+        working-directory: example-android-app
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      # The image ships several NDKs and rolls which one is default, so the
+      # revision is named rather than inherited, and installed if a later image
+      # has dropped it.
+      - name: Android NDK
+        run: |
+          "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" --install "ndk;28.2.13676358"
+          echo "ANDROID_NDK_HOME=$ANDROID_HOME/ndk/28.2.13676358" >> "$GITHUB_ENV"
+          echo "ANDROID_NDK_ROOT=$ANDROID_HOME/ndk/28.2.13676358" >> "$GITHUB_ENV"
+      # The image ships JDK 21 already; cargo-ndk is the only thing it lacks,
+      # and the native library is what :app:preBuild needs.
+      - name: Rust toolchain and the Android target
+        run: |
+          rustup update stable --no-self-update
+          rustup target add --toolchain stable aarch64-linux-android
+      - name: Cargo cache
+        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: |
+            ~/.cargo/bin
+            ~/.cargo/.crates.toml
+            ~/.cargo/.crates2.json
+            ~/.cargo/registry/index
+            ~/.cargo/registry/cache
+            ~/.cargo/git/db
+          key: cargo-ndk-3.5.4-${{ runner.os }}-${{ hashFiles('example-android-app/rust/Cargo.lock') }}
+      - name: cargo-ndk
+        run: cargo +stable install cargo-ndk --version 3.5.4 --locked
+      # Keyed apart from the Cargo cache: a Gradle change must not discard a
+      # cross-compilation toolchain, and the reverse.
+      - name: Gradle cache
+        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+          key: gradle-${{ runner.os }}-${{ hashFiles('example-android-app/gradle/wrapper/gradle-wrapper.properties', 'example-android-app/**/*.gradle.kts') }}
+      # The app's own Rust: the Penlock pipeline and its model inventory live
+      # here, not in the root crate.
+      - name: The app workspace's tests
+        run: cargo +stable test --locked --manifest-path rust/Cargo.toml --workspace --lib --tests
+      # Alone, without the feature unification a workspace build hands it: a
+      # test that needs a backend must not be the only cover for a contract
+      # that does not.
+      - name: The Penlock pipeline on its own default features
+        run: cargo +stable test --locked --manifest-path rust/Cargo.toml -p penlock-scan --tests
+      - name: Unit tests, the APK, and the instrumentation sources
+        env:
+          JAVA_HOME: ${{ env.JAVA_HOME_21_X64 }}
+        run: ./gradlew --no-daemon :app:testDebugUnitTest :app:assembleDebug :app:compileDebugAndroidTestKotlin

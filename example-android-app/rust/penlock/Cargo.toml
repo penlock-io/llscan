@@ -1,0 +1,21 @@
+[package]
+name = "penlock"
+version = "0.1.0"
+description = "Penlock v1: paper-compatible 2-of-3 secret splitting of BIP39 seed phrases over GF(29)"
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
+publish = false
+
+[dependencies]
+bip39 = "2.2"
+bitcoin = { version = "0.32", optional = true }
+rand = { version = "0.9", default-features = false }
+
+[features]
+# The `Fingerprint` oracle: BIP39 seed → BIP32 master key, which brings
+# secp256k1 and its C library.
+wallet = ["dep:bitcoin"]
+
+[dev-dependencies]
+rand = { version = "0.9", features = ["std_rng"] }
