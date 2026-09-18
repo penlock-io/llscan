@@ -15,8 +15,8 @@ pub mod title;
 pub mod wordsheet;
 
 #[cfg(feature = "word-extent")]
-pub use bip39_scan::extent;
-pub use bip39_scan::{
+pub use bitcoin_vision::extent;
+pub use bitcoin_vision::{
     boxes, detect, dot_grid, fragments, homography, hybrid, inference_limit, joins, layout,
     numbering, page_frame, phrase, progress, recogniser, region, sources, split, timing, words,
 };

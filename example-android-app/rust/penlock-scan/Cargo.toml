@@ -8,7 +8,7 @@ repository.workspace = true
 publish = false
 
 [dependencies]
-bip39-scan = { package = "bitcoin-vision", path = "../../..", default-features = false }
+bitcoin-vision = { package = "bitcoin-vision", path = "../../..", default-features = false }
 bitcoin_hashes = "0.14"
 image = { version = "0.25", default-features = false, features = ["png", "jpeg", "webp"] }
 imageproc = { version = "0.27", default-features = false }
@@ -23,7 +23,7 @@ pdf-writer = "0.12"
 
 [features]
 default = []
-onnx = ["dep:tract-onnx", "word-extent", "bip39-scan/onnx"]
-word-extent = ["bip39-scan/word-extent"]
-scan-profile = ["bip39-scan/scan-profile"]
-extent-experiment = ["word-extent", "scan-profile", "bip39-scan/extent-experiment"]
+onnx = ["dep:tract-onnx", "word-extent", "bitcoin-vision/onnx"]
+word-extent = ["bitcoin-vision/word-extent"]
+scan-profile = ["bitcoin-vision/scan-profile"]
+extent-experiment = ["word-extent", "scan-profile", "bitcoin-vision/extent-experiment"]

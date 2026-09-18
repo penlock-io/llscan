@@ -296,7 +296,7 @@ impl Onnx {
 }
 
 #[cfg(feature = "onnx")]
-pub(crate) use bip39_scan::runtime::run_plan;
+pub(crate) use bitcoin_vision::runtime::run_plan;
 
 #[cfg(feature = "onnx")]
 impl Model for Onnx {
